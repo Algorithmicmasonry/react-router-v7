@@ -1,8 +1,7 @@
-import {createClient} from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = process.env.SUPABASE_URL || ""
-const SUPABSE_ANON_KEY= process.env.SUPABSE_ANON_KEY ||  "";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
-console.log("These are the supabase env files: ", SUPABASE_URL, SUPABSE_ANON_KEY);
 
-export const superbase = createClient(SUPABASE_URL,SUPABSE_ANON_KEY);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

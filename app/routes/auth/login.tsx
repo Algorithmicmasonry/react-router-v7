@@ -3,10 +3,11 @@ import Logo from "~/components/global/logo";
 import type { Route } from "./+types/register";
 import LoginForm from "./_components/login-form";
 import { loginSchema } from "zod/loginIn";
+import { supabase } from "~/lib/supabase-client";
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
-  
+
   // Extract form data
   const rawData = {
     email: String(formData.get("email")),
@@ -15,33 +16,45 @@ export async function action({ request }: Route.ActionArgs) {
 
   // Validate with Zod
   const result = loginSchema.safeParse(rawData);
-  
+
   if (!result.success) {
     // Transform Zod errors to match the expected format
     const errors: Record<string, string> = {};
-    
-    result.error.issues.forEach(issue => {
+
+    result.error.issues.forEach((issue) => {
       const field = issue.path[0] as string;
       if (field && !errors[field]) {
         errors[field] = issue.message;
       }
     });
-    
+
     return data({ errors }, { status: 400 });
   }
 
   // If validation passes, proceed with login logic
   try {
     // Your login logic here
-    // await loginUser(result.data);
-    
+    const { data: authData, error: authError } =
+      await supabase.auth.signInWithPassword({
+        email: result.data.email,
+        password: result.data.password,
+      });
+
+    if (authError) {
+      console.log("Auth error:", authError);
+      return data({ errors: { general: authError.message } }, { status: 400 });
+    }
+
     // Redirect to dashboard if successful
     return redirect("/student-dashboard");
   } catch (error) {
     // Handle registration errors
-    return data({ 
-      errors: { general: "Login failed. Please try again." } 
-    }, { status: 500 });
+    return data(
+      {
+        errors: { general: "Login failed. Please try again." },
+      },
+      { status: 500 }
+    );
   }
 }
 

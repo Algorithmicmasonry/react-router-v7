@@ -1,6 +1,7 @@
 import { FaGoogle } from "react-icons/fa";
 import { useNavigation } from "react-router";
 import { Form, Link, useActionData } from "react-router";
+import { handleGoogleSignIn } from "supabase/handleGoogleSignIn";
 import PasswordInput from "~/components/forms/password-input";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -12,14 +13,20 @@ const LoginForm = () => {
   const data = useActionData();
   let errors = data?.errors;
 
-  console.log("This is the use action data from the login form", data);
   return (
     <Form action="/login" method="post" className="flex flex-col gap-6">
-      {errors?.general && (
+      {errors?.general === "Email not confirmed" ? (
         <div style={{ color: "red", marginBottom: "1rem" }}>
-          {errors.general}
+          {
+            "Your account has not been verified yet. Please check your inbox for the confirmation email and click the verification link to activate your account."
+          }
+        </div>
+      ) : (
+        <div style={{ color: "red", marginBottom: "1rem" }}>
+          {errors?.general}
         </div>
       )}
+
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Login To Your Account</h1>
         <p className="text-muted-foreground text-sm text-balance">
@@ -74,10 +81,11 @@ const LoginForm = () => {
         </div>
 
         <Button
-          type="submit"
+          type="button"
           variant="outline"
           className="w-full"
           disabled={isSubmitting}
+          onClick={handleGoogleSignIn}
         >
           <FaGoogle className="mr-2 w-6 h-6 text-red-500" />
           Login with Google

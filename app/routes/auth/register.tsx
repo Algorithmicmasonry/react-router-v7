@@ -2,11 +2,12 @@ import Logo from "~/components/global/logo";
 import type { Route } from "./+types/register";
 import RegisterForm from "./_components/registration-form";
 import { signupSchema } from "zod/signUp";
-import {data, redirect} from "react-router"
+import { data, redirect } from "react-router";
+import { supabase } from "~/lib/supabase-client";
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
-  
+
   // Extract form data
   const rawData = {
     firstName: String(formData.get("firstName")),
@@ -18,33 +19,64 @@ export async function action({ request }: Route.ActionArgs) {
 
   // Validate with Zod
   const result = signupSchema.safeParse(rawData);
-  
+
   if (!result.success) {
     // Transform Zod errors to match the expected format
     const errors: Record<string, string> = {};
-    
-    result.error.issues.forEach(issue => {
+
+    result.error.issues.forEach((issue) => {
       const field = issue.path[0] as string;
       if (field && !errors[field]) {
         errors[field] = issue.message;
       }
     });
-    
+
     return data({ errors }, { status: 400 });
   }
 
   // If validation passes, proceed with registration logic
   try {
     // Your registration logic here
-    // await createUser(result.data);
-    
-    // Redirect to dashboard if successful
-    return redirect("/login");
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: result.data.email,
+      password: result.data.password,
+    });
+
+    if (authError) {
+      console.log("Auth error: ", authError);
+      return data(
+        {
+          errors: { general: authError.message },
+        },
+        { status: 400 }
+      );
+    }
+
+    const { error: studentError } = await supabase.from("student").insert([
+      {
+        id: authData.user?.id,
+        first_name: result.data.firstName,
+        last_name: result.data.lastName,
+        email: result.data.email,
+      },
+    ]);
+
+    if (studentError) {
+      console.log("Student error: ", studentError);
+      return data(
+        { errors: { general: studentError.message } },
+        { status: 400 }
+      );
+    }
+
   } catch (error) {
     // Handle registration errors
-    return data({ 
-      errors: { general: "Registration failed. Please try again." } 
-    }, { status: 500 });
+    return data(
+      {
+        errors: { general: "Registration failed. Please try again." },
+      },
+      { status: 500 }
+    );
   }
 }
 

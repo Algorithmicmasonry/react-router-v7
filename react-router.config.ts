@@ -7,4 +7,5 @@ export default {
   ssr: true,
   presets: [vercelPreset()],
   prerender: ['/', '/register', "/login"],
+
 } satisfies Config;
