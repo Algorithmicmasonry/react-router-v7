@@ -1,7 +1,9 @@
 import React from "react";
-import { supabase } from "~/lib/supabase-client";
+import { supabase } from "supabase/supabase-client";
+import { useNavigate } from "react-router";
 
 export default function AuthCallback() {
+  const navigate = useNavigate();
   React.useEffect(() => {
     const hash = window.location.hash;
 
@@ -12,8 +14,10 @@ export default function AuthCallback() {
       const access_token = params.get("access_token");
       const refresh_token = params.get("refresh_token");
 
-      if (!access_token || !refresh_token) return;
-
+      if (!access_token || !refresh_token) {
+        navigate("/login"); // or your auth page
+        return;
+      }
       // Save Supabase session
       const { error: sessionError } = await supabase.auth.setSession({
         access_token,
@@ -65,9 +69,9 @@ export default function AuthCallback() {
 
       // ✅ Redirect based on is_onboarded flag
       if (student.is_onboarded) {
-        window.location.replace("/student_dashboard");
+        navigate("/student_dashboard");
       } else {
-        window.location.replace("/onboarding");
+        navigate("/onboarding");
       }
     }
 

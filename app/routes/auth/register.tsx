@@ -2,8 +2,8 @@ import Logo from "~/components/global/logo";
 import type { Route } from "./+types/register";
 import RegisterForm from "./_components/registration-form";
 import { signupSchema } from "zod/signUp";
-import { data, redirect } from "react-router";
-import { supabase } from "~/lib/supabase-client";
+import { data, Navigate, redirect } from "react-router";
+import { supabase } from "supabase/supabase-client";
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
@@ -69,6 +69,10 @@ export async function action({ request }: Route.ActionArgs) {
       );
     }
 
+    return data(
+      { success: true, message: "Account created! Please confirm your email." },
+      { status: 200 }
+    )
   } catch (error) {
     // Handle registration errors
     return data(

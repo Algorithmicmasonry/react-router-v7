@@ -3,7 +3,7 @@ import Logo from "~/components/global/logo";
 import type { Route } from "./+types/register";
 import LoginForm from "./_components/login-form";
 import { loginSchema } from "zod/loginIn";
-import { supabase } from "~/lib/supabase-client";
+import { supabase } from "supabase/supabase-client";
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();

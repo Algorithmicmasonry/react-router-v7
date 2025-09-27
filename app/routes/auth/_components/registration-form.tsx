@@ -10,6 +10,7 @@ import { Label } from "~/components/ui/label";
 export default function RegisterForm() {
   let fetcher = useFetcher();
   let errors = fetcher.data?.errors;
+  console.log("Fetcher data:", fetcher.data);
   let isSubmitting = fetcher.state == "submitting";
 
   return (
@@ -126,6 +127,7 @@ export default function RegisterForm() {
             variant="outline"
             className="w-full"
             disabled={isSubmitting}
+            onClick={handleGoogleSignIn}
           >
             <FaGoogle className="mr-2 w-6 h-6 text-red-500" />
             Sign up with Google

@@ -14,3 +14,10 @@ export interface PasswordInputProps {
   disabled?: boolean;
   className?: string;
 }
+
+
+export interface OnboardingFormProps{
+  firstName: string;
+  lastName: string;
+  email: string
+}

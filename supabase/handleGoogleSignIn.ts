@@ -1,4 +1,4 @@
-import { supabase } from "~/lib/supabase-client"; // your client export
+import { supabase } from "supabase/supabase-client"; // your client export
 
 export async function handleGoogleSignIn() {
   const baseUrl =
